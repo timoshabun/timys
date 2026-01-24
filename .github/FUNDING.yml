@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Виджет для поддержки</title>
+    <style>
+        .donate-widget {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 320px;
+            padding: 25px;
+            border-radius: 20px;
+            background: linear-gradient(145deg, #f9f9f9, #ffffff);
+            box-shadow: 10px 10px 30px #d9d9d9, -10px -10px 30px #ffffff;
+            text-align: center;
+            margin: 20px auto;
+            border: 1px solid #f0f0f0;
+        }
+        .donate-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 10px;
+        }
+        .donate-subtitle {
+            font-size: 14px;
+            color: #636e72;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .donate-qr {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .donate-qr img {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .donate-button {
+            display: inline-block;
+            background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            text-decoration: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(106, 17, 203, 0.3);
+            margin-top: 10px;
+        }
+        .donate-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 25px rgba(106, 17, 203, 0.4);
+        }
+        .donate-button:active {
+            transform: translateY(0);
+        }
+        .donate-note {
+            font-size: 13px;
+            color: #b2bec3;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Виджет для донатов -->
+    <div class="donate-widget">
+        <div class="donate-title">Поддержите проект</div>
+        <div class="donate-subtitle">Если вам нравится то, что я делаю, и вы хотите поддержать развитие, буду благодарен за любую сумму!</div>
+        
+        <div class="donate-qr">
+            <!-- QR-код, сгенерированный автоматически по вашей ссылке -->
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://one-qr.ru/v?fgMhfBB66V1G3Imq" alt="QR-код для доната">
+        </div>
+        
+        <!-- Кнопка-ссылка на донат -->
+        <a href="https://one-qr.ru/v?fgMhfBB66V1G3Imq" target="_blank" class="donate-button">Поддержать рублём</a>
+        
+        <div class="donate-note">Наведите камеру на QR-код или нажмите кнопку</div>
+    </div>
+
+</body>
+</html>
