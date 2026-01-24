@@ -1,0 +1,3090 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OZON Склад - Группы</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #005bff;
+            --primary-dark: #0047cc;
+            --primary-light: rgba(0, 91, 255, 0.1);
+            --secondary: #00cec9;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --info: #3498db;
+            --dark: #0f0c29;
+            --darker: #090719;
+            --light: #f9f9f9;
+            --gray: #636e72;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --radius: 15px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #24243e 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--primary);
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-1000px) rotate(720deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Экран выбора группы */
+        .group-select-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .group-select-box {
+            background: rgba(15, 12, 41, 0.9);
+            border-radius: var(--radius);
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .group-select-logo {
+            margin-bottom: 30px;
+        }
+
+        .group-select-logo i {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(0, 91, 255, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .group-select-logo h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+
+        .group-select-logo p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Список групп */
+        .groups-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .groups-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .groups-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .groups-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .group-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .group-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .group-item.active {
+            background: linear-gradient(45deg, rgba(0, 91, 255, 0.2), rgba(0, 206, 201, 0.2));
+            border-color: var(--primary);
+        }
+
+        .group-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .group-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .group-details h3 {
+            font-size: 1.3rem;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .group-details p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .group-stats {
+            display: flex;
+            gap: 15px;
+        }
+
+        .stat-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Форма входа в группу */
+        .group-access-form {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .group-access-form h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .access-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .access-input-group input {
+            flex: 1;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .access-input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 91, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .access-hint {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        /* Создание новой группы */
+        .create-group-form {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .create-group-form h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .create-group-form h3 i {
+            color: var(--primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Главное меню */
+        .main-menu {
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Верхняя панель */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: rgba(15, 12, 41, 0.9);
+            border-radius: var(--radius);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .group-info-bar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .group-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .group-badge.admin {
+            background: linear-gradient(45deg, var(--warning), #e67e22);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 91, 255, 0.3);
+        }
+
+        .user-info h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            font-size: 0.9rem;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sync-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sync-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .sync-indicator.syncing {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--info);
+            animation: pulse 1s infinite;
+        }
+
+        .sync-indicator.synced {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+        }
+
+        .sync-indicator.error {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+        }
+
+        /* Боковое меню */
+        .menu-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+            min-height: calc(100vh - 160px);
+        }
+
+        @media (max-width: 1024px) {
+            .menu-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .side-menu {
+            background: rgba(15, 12, 41, 0.9);
+            border-radius: var(--radius);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .menu-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-header h2 {
+            font-size: 1.5rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-header h2 i {
+            color: var(--primary);
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px 20px;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: none;
+            background: none;
+            text-align: left;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-item:hover::before {
+            left: 100%;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 91, 255, 0.3);
+        }
+
+        .nav-item i {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Контент меню */
+        .menu-content {
+            background: rgba(15, 12, 41, 0.9);
+            border-radius: var(--radius);
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            animation: contentFade 0.3s ease;
+        }
+
+        @keyframes contentFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .content-header h2 {
+            font-size: 1.8rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .content-header h2 i {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        .content-header p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        /* Карточки */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        /* Кнопки */
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 91, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 91, 255, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--success), #27ae60);
+            color: white;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, var(--warning), #e67e22);
+            color: white;
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(243, 156, 18, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, var(--danger), #c0392b);
+            color: white;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(45deg, var(--info), #2980b9);
+            color: white;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-info:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            color: white;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+        }
+
+        /* Формы */
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 1rem;
+            min-width: 200px;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 91, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* Списки */
+        .packages-list {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding-right: 10px;
+        }
+
+        .packages-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .packages-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .packages-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .package-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .package-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .package-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .package-code {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        .package-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge-order {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .badge-ready {
+            background: linear-gradient(45deg, var(--success), #27ae60);
+            color: white;
+        }
+
+        .badge-pending {
+            background: linear-gradient(45deg, var(--warning), #e67e22);
+            color: white;
+        }
+
+        .badge-delivered {
+            background: linear-gradient(45deg, var(--info), #2980b9);
+            color: white;
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 25px;
+            border-radius: var(--radius);
+            z-index: 10000;
+            box-shadow: var(--shadow);
+            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            max-width: 350px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(100%); }
+        }
+
+        .notification.success {
+            background: linear-gradient(45deg, var(--success), #27ae60);
+            color: white;
+        }
+
+        .notification.error {
+            background: linear-gradient(45deg, var(--danger), #c0392b);
+            color: white;
+        }
+
+        .notification.info {
+            background: linear-gradient(45deg, var(--info), #2980b9);
+            color: white;
+        }
+
+        .notification.warning {
+            background: linear-gradient(45deg, var(--warning), #e67e22);
+            color: white;
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: rgba(15, 12, 41, 0.95);
+            padding: 40px;
+            border-radius: var(--radius);
+            max-width: 800px;
+            width: 100%;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Пустые состояния */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Выдача заказа */
+        .order-delivery {
+            background: linear-gradient(45deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.1));
+            border: 2px solid var(--success);
+        }
+
+        .delivery-info {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .info-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Статус заказа */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(243, 156, 18, 0.2);
+            color: var(--warning);
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+
+        .status-ready {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .status-delivered {
+            background: rgba(52, 152, 219, 0.2);
+            color: var(--info);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+
+        /* Управление группой */
+        .group-management {
+            margin-top: 30px;
+        }
+
+        .members-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .member-role {
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .role-admin {
+            background: rgba(243, 156, 18, 0.2);
+            color: var(--warning);
+        }
+
+        .role-member {
+            background: rgba(52, 152, 219, 0.2);
+            color: var(--info);
+        }
+
+        /* Анимация синхронизации */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .syncing i {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .input-group input {
+                min-width: 100%;
+            }
+            
+            .menu-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Анимированный фон -->
+    <div class="background-animation" id="particles"></div>
+
+    <!-- Экран выбора группы -->
+    <div class="container" id="groupSelectScreen">
+        <div class="group-select-screen">
+            <div class="group-select-box">
+                <div class="group-select-logo">
+                    <i class="fas fa-users"></i>
+                    <h1>OZON ГРУППЫ</h1>
+                    <p>Выберите или создайте рабочую группу</p>
+                </div>
+                
+                <div class="groups-list" id="groupsList">
+                    <!-- Список групп будет здесь -->
+                </div>
+                
+                <!-- Форма входа в существующую группу -->
+                <div class="group-access-form" id="groupAccessForm" style="display: none;">
+                    <h3>Войти в группу</h3>
+                    <div class="access-input-group">
+                        <input type="password" id="groupPassword" placeholder="Введите пароль группы">
+                        <button class="btn btn-primary" id="joinGroupBtn">
+                            <i class="fas fa-sign-in-alt"></i> Войти
+                        </button>
+                    </div>
+                    <div class="access-hint">
+                        <i class="fas fa-info-circle"></i>
+                        Для входа в группу требуется пароль. Попросите его у администратора группы.
+                    </div>
+                </div>
+                
+                <!-- Форма создания новой группы -->
+                <div class="create-group-form">
+                    <h3><i class="fas fa-plus-circle"></i> Создать новую группу</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newGroupName">Название группы:</label>
+                            <input type="text" id="newGroupName" placeholder="Например: Склад №1, Офис, Магазин">
+                        </div>
+                        <div class="form-group">
+                            <label for="newGroupPassword">Пароль группы:</label>
+                            <input type="password" id="newGroupPassword" placeholder="Придумайте пароль">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newGroupDescription">Описание группы:</label>
+                        <input type="text" id="newGroupDescription" placeholder="Опишите назначение группы">
+                    </div>
+                    <button class="btn btn-success" id="createGroupBtn" style="width: 100%;">
+                        <i class="fas fa-users"></i> Создать группу
+                    </button>
+                </div>
+                
+                <div class="access-hint" style="margin-top: 30px;">
+                    <i class="fas fa-shield-alt"></i>
+                    Каждая группа изолирована. Заказы видны только участникам группы.
+                    Для входа в существующую группу нужен пароль от администратора.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Главное меню -->
+    <div class="container" id="mainMenu" style="display: none;">
+        <!-- Верхняя панель -->
+        <div class="top-bar">
+            <div class="group-info-bar">
+                <div class="group-badge" id="groupBadge">
+                    <i class="fas fa-users"></i>
+                    <span id="currentGroupName">Группа не выбрана</span>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <h3 id="currentUserName">Иванов Иван Иванович</h3>
+                        <p>
+                            <span id="userRole">Участник</span>
+                            <span id="userStats">• 0 заказов</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sync-controls">
+                <div class="sync-indicator" id="syncIndicator">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Готов к синхронизации</span>
+                </div>
+                <button class="btn btn-secondary" id="manualSyncBtn">
+                    <i class="fas fa-sync-alt"></i> Синхронизировать
+                </button>
+                <button class="btn btn-danger" id="leaveGroupBtn">
+                    <i class="fas fa-sign-out-alt"></i> Выйти из группы
+                </button>
+            </div>
+        </div>
+
+        <!-- Основное меню -->
+        <div class="menu-container">
+            <!-- Боковое меню -->
+            <div class="side-menu">
+                <div class="menu-header">
+                    <h2><i class="fas fa-bars"></i> Навигация</h2>
+                </div>
+                
+                <nav class="nav-menu">
+                    <button class="nav-item active" data-tab="order-tab">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Заказывать товары</span>
+                        <span class="badge" id="orderBadge">0</span>
+                    </button>
+                    
+                    <button class="nav-item" data-tab="work-tab">
+                        <i class="fas fa-warehouse"></i>
+                        <span>Работать на складе</span>
+                        <span class="badge" id="workBadge">0</span>
+                    </button>
+                    
+                    <button class="nav-item" data-tab="delivery-tab">
+                        <i class="fas fa-box-check"></i>
+                        <span>Выдача заказов</span>
+                        <span class="badge" id="deliveryBadge">0</span>
+                    </button>
+                    
+                    <button class="nav-item" data-tab="group-tab">
+                        <i class="fas fa-users"></i>
+                        <span>Управление группой</span>
+                    </button>
+                    
+                    <button class="nav-item" data-tab="sync-tab">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Синхронизация</span>
+                    </button>
+                </nav>
+                
+                <div class="device-info" style="margin-top: 30px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
+                    <h4 style="color: white; margin-bottom: 10px; font-size: 1.1rem;">
+                        <i class="fas fa-info-circle"></i> Информация о группе
+                    </h4>
+                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">
+                        <div style="margin-bottom: 5px;">Участников: <span id="groupMembersCount">0</span></div>
+                        <div style="margin-bottom: 5px;">Заказов: <span id="groupOrdersCount">0</span></div>
+                        <div>Создана: <span id="groupCreatedDate">неизвестно</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Контент меню -->
+            <div class="menu-content">
+                <!-- Вкладка Заказывать -->
+                <div class="menu-tab-content active" id="order-tab">
+                    <div class="content-header">
+                        <h2><i class="fas fa-shopping-cart"></i> Заказ товаров</h2>
+                        <p>Создайте новый заказ в вашей группе</p>
+                    </div>
+                    
+                    <!-- Форма заказа -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-plus-circle"></i> Новый заказ
+                            </div>
+                        </div>
+                        
+                        <div class="order-form">
+                            <div class="form-group">
+                                <label for="productName"><i class="fas fa-box"></i> Товар:</label>
+                                <div class="input-group">
+                                    <input type="text" id="productName" placeholder="Введите название товара">
+                                    <button class="btn btn-primary" id="addProductToOrderBtn">
+                                        <i class="fas fa-plus"></i> Добавить
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-list"></i> Товары в заказе:</label>
+                                <div class="products-list card" id="orderProductsContainer">
+                                    <div class="empty-state">
+                                        <i class="fas fa-box-open"></i>
+                                        <h3>Корзина пуста</h3>
+                                        <p>Добавьте хотя бы один товар для создания заказа</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-barcode"></i> Номер заказа:</label>
+                                <div class="input-group">
+                                    <input type="text" id="orderNumberDisplay" readonly placeholder="Заказ будет сгенерирован">
+                                    <button class="btn btn-info" id="copyOrderBtn">
+                                        <i class="fas fa-copy"></i> Копировать номер
+                                    </button>
+                                </div>
+                                <div style="margin-top: 10px; display: none;" id="copyWarning">
+                                    <div style="background: rgba(243, 156, 18, 0.1); padding: 12px; border-radius: 8px; border-left: 4px solid var(--warning);">
+                                        <i class="fas fa-exclamation-triangle" style="color: var(--warning); margin-right: 10px;"></i>
+                                        <span style="color: var(--warning); font-weight: 600;">ВАЖНО! Скопируйте номер заказа! Он понадобится для получения в вашей группе.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-info-circle"></i> Инструкция:</label>
+                                <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid var(--info);">
+                                    <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 10px;">
+                                        <i class="fas fa-lightbulb"></i> <strong>Как получить заказ в вашей группе:</strong>
+                                    </p>
+                                    <ol style="color: rgba(255, 255, 255, 0.7); padding-left: 20px; line-height: 1.6;">
+                                        <li>Скопируйте номер заказа выше</li>
+                                        <li>Попросите сотрудника вашей группы обработать заказ</li>
+                                        <li>После обработки заказ появится в "Выдаче заказов"</li>
+                                        <li>Введите номер заказа для получения</li>
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-success" id="submitOrderBtn" disabled style="width: 100%; padding: 18px;">
+                                <i class="fas fa-paper-plane"></i> Отправить заказ в группу
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Мои заказы в группе -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-history"></i> Мои заказы в группе
+                            </div>
+                            <button class="btn btn-secondary" id="refreshOrdersBtn">
+                                <i class="fas fa-sync-alt"></i> Обновить
+                            </button>
+                        </div>
+                        
+                        <div class="packages-list" id="userOrdersList">
+                            <!-- Заказы пользователя будут здесь -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка Работать -->
+                <div class="menu-tab-content" id="work-tab">
+                    <div class="content-header">
+                        <h2><i class="fas fa-warehouse"></i> Рабочий склад</h2>
+                        <p>Обработка заказов в вашей группе. Требуется права сотрудника.</p>
+                    </div>
+                    
+                    <!-- Доступ для сотрудников -->
+                    <div class="card" id="workerAccessCard">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-lock"></i> Доступ для сотрудников группы
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 20px;">
+                            <p style="margin-bottom: 20px; color: rgba(255, 255, 255, 0.7);">
+                                Для обработки заказов в вашей группе требуется код сотрудника:
+                            </p>
+                            
+                            <div class="input-group">
+                                <input type="password" id="workerCode" placeholder="Введите код сотрудника">
+                                <button class="btn btn-primary" id="enterWorkModeBtn">
+                                    <i class="fas fa-unlock"></i> Стать сотрудником
+                                </button>
+                            </div>
+                            
+                            <div style="margin-top: 15px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem;">
+                                <i class="fas fa-shield-alt"></i> Попросите код у администратора группы
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Рабочая область -->
+                    <div id="workArea" style="display: none;">
+                        <!-- Обработка заказов -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="fas fa-cogs"></i> Заказы на обработку в группе
+                                </div>
+                                <button class="btn btn-secondary" id="refreshWorkOrdersBtn">
+                                    <i class="fas fa-sync-alt"></i> Обновить
+                                </button>
+                            </div>
+                            
+                            <div class="packages-list" id="workOrdersList">
+                                <!-- Заказы для обработки будут здесь -->
+                            </div>
+                        </div>
+
+                        <!-- Статистика группы -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="fas fa-chart-bar"></i> Статистика группы
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px;">
+                                <div style="text-align: center; padding: 25px; background: rgba(0, 91, 255, 0.1); border-radius: 12px;">
+                                    <div style="font-size: 2.5rem; font-weight: bold; color: var(--primary); margin-bottom: 10px;" id="totalOrdersStat">0</div>
+                                    <div style="color: rgba(255, 255, 255, 0.7);">Всего заказов</div>
+                                </div>
+                                <div style="text-align: center; padding: 25px; background: rgba(243, 156, 18, 0.1); border-radius: 12px;">
+                                    <div style="font-size: 2.5rem; font-weight: bold; color: var(--warning); margin-bottom: 10px;" id="pendingOrdersStat">0</div>
+                                    <div style="color: rgba(255, 255, 255, 0.7);">На обработке</div>
+                                </div>
+                                <div style="text-align: center; padding: 25px; background: rgba(46, 204, 113, 0.1); border-radius: 12px;">
+                                    <div style="font-size: 2.5rem; font-weight: bold; color: var(--success); margin-bottom: 10px;" id="readyOrdersStat">0</div>
+                                    <div style="color: rgba(255, 255, 255, 0.7);">Готовы к выдаче</div>
+                                </div>
+                                <div style="text-align: center; padding: 25px; background: rgba(52, 152, 219, 0.1); border-radius: 12px;">
+                                    <div style="font-size: 2.5rem; font-weight: bold; color: var(--info); margin-bottom: 10px;" id="deliveredOrdersStat">0</div>
+                                    <div style="color: rgba(255, 255, 255, 0.7);">Выдано</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка Выдача заказов -->
+                <div class="menu-tab-content" id="delivery-tab">
+                    <div class="content-header">
+                        <h2><i class="fas fa-box-check"></i> Выдача заказов</h2>
+                        <p>Получение заказов, созданных в вашей группе</p>
+                    </div>
+                    
+                    <!-- Поиск заказа -->
+                    <div class="card order-delivery">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-search"></i> Поиск заказа в группе
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 20px;">
+                            <p style="margin-bottom: 20px; color: rgba(255, 255, 255, 0.8);">
+                                Введите номер заказа, созданного в вашей группе:
+                            </p>
+                            
+                            <div class="input-group">
+                                <input type="text" id="searchOrderNumber" placeholder="Введите номер заказа (например: OZ-123456)" style="flex: 2;">
+                                <button class="btn btn-primary" id="searchOrderBtn">
+                                    <i class="fas fa-search"></i> Найти заказ
+                                </button>
+                            </div>
+                            
+                            <div style="margin-top: 15px; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">
+                                <i class="fas fa-info-circle"></i> Видны только заказы из вашей группы
+                            </div>
+                            
+                            <div id="searchResults" class="search-results" style="margin-top: 20px;">
+                                <!-- Результаты поиска будут здесь -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Готовые к выдаче -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-boxes"></i> Заказы готовые к выдаче
+                            </div>
+                            <button class="btn btn-secondary" id="refreshReadyOrdersBtn">
+                                <i class="fas fa-sync-alt"></i> Обновить
+                            </button>
+                        </div>
+                        
+                        <div class="packages-list" id="readyOrdersList">
+                            <!-- Заказы готовые к выдаче будут здесь -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка Управление группой -->
+                <div class="menu-tab-content" id="group-tab">
+                    <div class="content-header">
+                        <h2><i class="fas fa-users"></i> Управление группой</h2>
+                        <p>Настройки и управление вашей рабочей группой</p>
+                    </div>
+                    
+                    <!-- Информация о группе -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-info-circle"></i> Информация о группе
+                            </div>
+                            <div class="group-badge admin" id="adminBadge" style="display: none;">
+                                <i class="fas fa-crown"></i> Администратор
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 20px;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
+                                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Название группы</div>
+                                    <div style="color: white; font-size: 1.3rem; font-weight: 600;" id="groupInfoName">Неизвестно</div>
+                                </div>
+                                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
+                                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">ID группы</div>
+                                    <div style="color: white; font-size: 1.1rem; font-family: 'Courier New', monospace;" id="groupInfoId">-</div>
+                                </div>
+                                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
+                                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Дата создания</div>
+                                    <div style="color: white; font-size: 1.1rem;" id="groupInfoCreated">-</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 20px;">
+                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 10px;">Описание:</div>
+                                <div style="color: white; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;" id="groupInfoDescription">
+                                    Описание не указано
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Участники группы -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-user-friends"></i> Участники группы
+                            </div>
+                            <button class="btn btn-secondary" id="refreshMembersBtn">
+                                <i class="fas fa-sync-alt"></i> Обновить
+                            </button>
+                        </div>
+                        
+                        <div class="members-list" id="groupMembersList">
+                            <!-- Участники группы будут здесь -->
+                        </div>
+                    </div>
+
+                    <!-- Настройки группы (только для админа) -->
+                    <div class="card" id="groupSettingsCard" style="display: none;">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-cog"></i> Настройки группы (Администратор)
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 20px;">
+                            <div class="form-group">
+                                <label for="groupWorkerCode"><i class="fas fa-key"></i> Код для сотрудников:</label>
+                                <div class="input-group">
+                                    <input type="text" id="groupWorkerCode" readonly placeholder="Код для входа в режим сотрудника">
+                                    <button class="btn btn-info" id="generateWorkerCodeBtn">
+                                        <i class="fas fa-redo"></i> Сгенерировать новый
+                                    </button>
+                                </div>
+                                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; margin-top: 5px;">
+                                    Этот код нужен участникам для работы в режиме "Работать на складе"
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="groupInviteLink"><i class="fas fa-link"></i> Ссылка для приглашения:</label>
+                                <div class="input-group">
+                                    <input type="text" id="groupInviteLink" readonly placeholder="Ссылка будет сгенерирована">
+                                    <button class="btn btn-info" id="copyInviteLinkBtn">
+                                        <i class="fas fa-copy"></i> Копировать
+                                    </button>
+                                </div>
+                                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; margin-top: 5px;">
+                                    Отправьте эту ссылку и пароль группы для приглашения новых участников
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                                <h4 style="color: white; margin-bottom: 15px;">
+                                    <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i> Опасные настройки
+                                </h4>
+                                <div style="display: flex; gap: 15px;">
+                                    <button class="btn btn-warning" id="changeGroupPasswordBtn">
+                                        <i class="fas fa-key"></i> Сменить пароль группы
+                                    </button>
+                                    <button class="btn btn-danger" id="deleteGroupBtn">
+                                        <i class="fas fa-trash"></i> Удалить группу
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка Синхронизация -->
+                <div class="menu-tab-content" id="sync-tab">
+                    <div class="content-header">
+                        <h2><i class="fas fa-sync-alt"></i> Синхронизация</h2>
+                        <p>Управление синхронизацией данных в группе</p>
+                    </div>
+                    
+                    <!-- Статус синхронизации -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-network-wired"></i> Статус синхронизации группы
+                            </div>
+                            <button class="btn btn-primary" id="forceSyncBtn">
+                                <i class="fas fa-bolt"></i> Принудительная синхронизация
+                            </button>
+                        </div>
+                        
+                        <div style="padding: 20px;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                                <div style="padding: 20px; background: rgba(52, 152, 219, 0.1); border-radius: 12px;">
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                        <i class="fas fa-database" style="color: var(--info); font-size: 1.5rem;"></i>
+                                        <div>
+                                            <div style="color: white; font-weight: 600; font-size: 1.2rem;" id="syncOrdersCount">0</div>
+                                            <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">Заказов в группе</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="padding: 20px; background: rgba(46, 204, 113, 0.1); border-radius: 12px;">
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                        <i class="fas fa-sync-alt" style="color: var(--success); font-size: 1.5rem;"></i>
+                                        <div>
+                                            <div style="color: white; font-weight: 600; font-size: 1.2rem;" id="syncLastUpdate">Только что</div>
+                                            <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">Последняя синхронизация</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="padding: 20px; background: rgba(243, 156, 18, 0.1); border-radius: 12px;">
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                        <i class="fas fa-users" style="color: var(--warning); font-size: 1.5rem;"></i>
+                                        <div>
+                                            <div style="color: white; font-weight: 600; font-size: 1.2rem;" id="syncMembersCount">0</div>
+                                            <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">Участников в группе</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px;">
+                                <h4 style="color: white; margin-bottom: 15px;">
+                                    <i class="fas fa-info-circle" style="color: var(--info);"></i> Как работает синхронизация в группе
+                                </h4>
+                                <ul style="color: rgba(255, 255, 255, 0.8); padding-left: 20px; line-height: 1.6;">
+                                    <li>Все данные группы хранятся в общем хранилище</li>
+                                    <li>При создании заказа он автоматически синхронизируется со всеми участниками</li>
+                                    <li>Сотрудники видят все заказы группы и могут их обрабатывать</li>
+                                    <li>Заказы из других групп не видны в вашей группе</li>
+                                    <li>Данные синхронизируются автоматически каждые 5 секунд</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно выдачи заказа -->
+    <div class="modal" id="deliverOrderModal">
+        <div class="modal-content">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid rgba(255, 255, 255, 0.1);">
+                <h2 style="font-size: 1.8rem; color: white; display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-box-check" style="color: var(--success);"></i> Выдача заказа
+                </h2>
+                <button class="close-btn" id="closeDeliverModalBtn" style="background: none; border: none; color: rgba(255, 255, 255, 0.5); font-size: 1.5rem; cursor: pointer; transition: var(--transition);">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="delivery-info">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Номер заказа</div>
+                        <div class="info-value" id="deliverOrderNumber">OZ-000001</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Заказчик</div>
+                        <div class="info-value" id="deliverCustomer">Иванов Иван Иванович</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Группа</div>
+                        <div class="info-value" id="deliverGroupName">Группа 1</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Статус</div>
+                        <div class="info-value">
+                            <span class="status-indicator status-ready" id="deliverStatus">Готов к выдаче</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin: 30px 0;">
+                <h3 style="color: white; margin-bottom: 20px; font-size: 1.3rem;">
+                    <i class="fas fa-boxes" style="color: var(--primary); margin-right: 10px;"></i> Товары в заказе:
+                </h3>
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px;" id="deliverOrderProducts">
+                    <!-- Товары будут добавляться здесь -->
+                </div>
+            </div>
+            
+            <div style="margin: 30px 0;">
+                <h3 style="color: white; margin-bottom: 20px; font-size: 1.3rem;">
+                    <i class="fas fa-user-check" style="color: var(--primary); margin-right: 10px;"></i> Подтверждение личности:
+                </h3>
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px;">
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 15px;">
+                        Попросите клиента назвать ФИО, указанное при оформлении заказа:
+                    </p>
+                    <div style="padding: 15px; background: rgba(46, 204, 113, 0.1); border-radius: 8px; border-left: 4px solid var(--success);">
+                        <div style="color: var(--success); font-weight: 600; margin-bottom: 5px;">Ожидаемый ответ:</div>
+                        <div style="color: white; font-size: 1.2rem;" id="expectedCustomerName">Иванов Иван Иванович</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 40px;">
+                <button class="btn btn-warning" id="cancelDeliverBtn" style="flex: 1; padding: 18px;">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+                <button class="btn btn-success" id="confirmDeliverBtn" style="flex: 1; padding: 18px;">
+                    <i class="fas fa-check"></i> Подтвердить выдачу
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
+        let currentUser = null;
+        let currentGroup = null;
+        let isWorkerMode = false;
+        let isAdmin = false;
+        let allGroups = [];
+        let allUsers = [];
+        let allOrders = [];
+        let deviceId = null;
+        let syncInterval = null;
+        let currentOrderProducts = [];
+        let currentDeliveryOrder = null;
+        let isOrderNumberCopied = false;
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            generateDeviceId();
+            loadData();
+            setupEventListeners();
+            startSync();
+            updateGroupsList();
+        });
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 10 + 5 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = Math.random() * 20 + 10 + 's';
+                particle.style.background = `rgba(0, 91, 255, ${Math.random() * 0.3 + 0.1})`;
+                container.appendChild(particle);
+            }
+        }
+
+        function generateDeviceId() {
+            let deviceId = localStorage.getItem('ozon_device_id');
+            if (!deviceId) {
+                deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('ozon_device_id', deviceId);
+            }
+            window.deviceId = deviceId;
+            return deviceId;
+        }
+
+        // ===== ЗАГРУЗКА И СОХРАНЕНИЕ ДАННЫХ =====
+        function loadData() {
+            try {
+                const savedGroups = localStorage.getItem('ozon_groups');
+                const savedUsers = localStorage.getItem('ozon_users');
+                const savedOrders = localStorage.getItem('ozon_orders');
+                const savedCurrentGroup = localStorage.getItem('ozon_current_group');
+                const savedCurrentUser = localStorage.getItem('ozon_current_user');
+                
+                if (savedGroups) allGroups = JSON.parse(savedGroups) || [];
+                if (savedUsers) allUsers = JSON.parse(savedUsers) || [];
+                if (savedOrders) allOrders = JSON.parse(savedOrders) || [];
+                
+                // Восстанавливаем текущую группу и пользователя
+                if (savedCurrentGroup) {
+                    currentGroup = JSON.parse(savedCurrentGroup);
+                    const groupExists = allGroups.some(g => g.id === currentGroup.id);
+                    if (!groupExists) {
+                        currentGroup = null;
+                        localStorage.removeItem('ozon_current_group');
+                    }
+                }
+                
+                if (savedCurrentUser && currentGroup) {
+                    currentUser = JSON.parse(savedCurrentUser);
+                    const userExists = allUsers.some(u => u.id === currentUser.id && u.groupId === currentGroup.id);
+                    if (!userExists) {
+                        currentUser = null;
+                        localStorage.removeItem('ozon_current_user');
+                    } else {
+                        isAdmin = currentUser.role === 'admin';
+                        showMainMenu();
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Ошибка при загрузке данных:', error);
+                allGroups = [];
+                allUsers = [];
+                allOrders = [];
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('ozon_groups', JSON.stringify(allGroups));
+                localStorage.setItem('ozon_users', JSON.stringify(allUsers));
+                localStorage.setItem('ozon_orders', JSON.stringify(allOrders));
+                
+                if (currentGroup) {
+                    localStorage.setItem('ozon_current_group', JSON.stringify(currentGroup));
+                }
+                
+                if (currentUser) {
+                    localStorage.setItem('ozon_current_user', JSON.stringify(currentUser));
+                }
+                
+                // Сохраняем в общее хранилище для синхронизации
+                saveToSharedStorage();
+                
+            } catch (error) {
+                console.error('Ошибка при сохранении данных:', error);
+            }
+        }
+
+        function saveToSharedStorage() {
+            try {
+                const sharedData = {
+                    groups: allGroups,
+                    users: allUsers,
+                    orders: allOrders,
+                    lastUpdate: new Date().toISOString(),
+                    deviceId: window.deviceId
+                };
+                
+                localStorage.setItem('ozon_shared_data', JSON.stringify(sharedData));
+                localStorage.setItem('ozon_last_change', JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    deviceId: window.deviceId,
+                    type: 'update'
+                }));
+                
+            } catch (error) {
+                console.error('Ошибка при сохранении в общее хранилище:', error);
+            }
+        }
+
+        function loadSharedData() {
+            try {
+                const sharedData = localStorage.getItem('ozon_shared_data');
+                if (!sharedData) return;
+                
+                const data = JSON.parse(sharedData);
+                const lastLocalUpdate = localStorage.getItem('ozon_last_update') || '0';
+                const sharedUpdate = data.lastUpdate || '0';
+                
+                if (new Date(sharedUpdate) > new Date(lastLocalUpdate)) {
+                    // Объединяем данные групп
+                    allGroups = mergeArraysByKey(allGroups, data.groups || [], 'id');
+                    
+                    // Объединяем пользователей
+                    allUsers = mergeArraysByKey(allUsers, data.users || [], 'id');
+                    
+                    // Объединяем заказы
+                    allOrders = mergeArraysByKey(allOrders, data.orders || [], 'id');
+                    
+                    localStorage.setItem('ozon_last_update', sharedUpdate);
+                    
+                    console.log('Данные загружены из общего хранилища');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка при загрузке из общего хранилища:', error);
+            }
+        }
+
+        function mergeArraysByKey(localArray, sharedArray, key) {
+            const merged = [...localArray];
+            const localKeys = new Set(localArray.map(item => item[key]));
+            
+            for (const item of sharedArray) {
+                if (!localKeys.has(item[key])) {
+                    merged.push(item);
+                } else {
+                    const index = merged.findIndex(i => i[key] === item[key]);
+                    if (index !== -1) {
+                        // Сохраняем более новую версию
+                        if (item.updatedAt && merged[index].updatedAt) {
+                            if (new Date(item.updatedAt) > new Date(merged[index].updatedAt)) {
+                                merged[index] = item;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return merged;
+        }
+
+        // ===== СИНХРОНИЗАЦИЯ =====
+        function startSync() {
+            performSync();
+            syncInterval = setInterval(performSync, 5000);
+            
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) performSync();
+            });
+        }
+
+        function performSync() {
+            updateSyncStatus('syncing');
+            
+            try {
+                const lastChange = localStorage.getItem('ozon_last_change');
+                const lastLocalSync = localStorage.getItem('ozon_last_sync') || '0';
+                
+                if (lastChange) {
+                    const change = JSON.parse(lastChange);
+                    if (change.deviceId !== window.deviceId && change.timestamp > lastLocalSync) {
+                        loadSharedData();
+                        updateSyncStatus('synced', 'Данные синхронизированы');
+                        
+                        if (currentUser && currentGroup) {
+                            updateUIAfterSync();
+                        }
+                    }
+                }
+                
+                localStorage.setItem('ozon_last_sync', new Date().toISOString());
+                
+            } catch (error) {
+                console.error('Ошибка при синхронизации:', error);
+                updateSyncStatus('error', 'Ошибка синхронизации');
+            }
+        }
+
+        function updateSyncStatus(status, message = '') {
+            const indicator = document.getElementById('syncIndicator');
+            if (!indicator) return;
+            
+            indicator.className = `sync-indicator ${status}`;
+            if (status === 'syncing') {
+                indicator.innerHTML = '<i class="fas fa-sync-alt"></i> <span>Синхронизация...</span>';
+            } else if (status === 'synced') {
+                indicator.innerHTML = `<i class="fas fa-check-circle"></i> <span>${message || 'Синхронизировано'}</span>`;
+                setTimeout(() => {
+                    if (indicator.className.includes('synced')) {
+                        indicator.className = 'sync-indicator';
+                        indicator.innerHTML = '<i class="fas fa-sync-alt"></i> <span>Готов к синхронизации</span>';
+                    }
+                }, 3000);
+            }
+        }
+
+        // ===== УПРАВЛЕНИЕ ГРУППАМИ =====
+        function updateGroupsList() {
+            const groupsList = document.getElementById('groupsList');
+            groupsList.innerHTML = '';
+            
+            if (allGroups.length === 0) {
+                groupsList.innerHTML = `
+                    <div class="empty-state" style="padding: 30px 20px;">
+                        <i class="fas fa-users" style="font-size: 3rem;"></i>
+                        <h3 style="margin: 15px 0 10px;">Нет групп</h3>
+                        <p>Создайте первую группу</p>
+                    </div>
+                `;
+            } else {
+                allGroups.forEach(group => {
+                    const groupUsers = allUsers.filter(u => u.groupId === group.id);
+                    const groupOrders = allOrders.filter(o => o.groupId === group.id);
+                    
+                    const groupElement = document.createElement('div');
+                    groupElement.className = 'group-item';
+                    groupElement.dataset.groupId = group.id;
+                    
+                    groupElement.innerHTML = `
+                        <div class="group-info">
+                            <div class="group-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="group-details">
+                                <h3>${group.name}</h3>
+                                <p>${group.description || 'Без описания'}</p>
+                            </div>
+                        </div>
+                        <div class="group-stats">
+                            <span class="stat-badge">
+                                <i class="fas fa-user"></i> ${groupUsers.length}
+                            </span>
+                            <span class="stat-badge">
+                                <i class="fas fa-box"></i> ${groupOrders.length}
+                            </span>
+                        </div>
+                    `;
+                    
+                    groupElement.addEventListener('click', function() {
+                        selectGroup(group.id);
+                    });
+                    
+                    groupsList.appendChild(groupElement);
+                });
+            }
+        }
+
+        function selectGroup(groupId) {
+            const group = allGroups.find(g => g.id === groupId);
+            if (!group) return;
+            
+            // Сбрасываем выбор других групп
+            document.querySelectorAll('.group-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Выделяем выбранную группу
+            const selectedItem = document.querySelector(`[data-group-id="${groupId}"]`);
+            if (selectedItem) {
+                selectedItem.classList.add('active');
+            }
+            
+            // Показываем форму входа
+            document.getElementById('groupAccessForm').style.display = 'block';
+            document.getElementById('groupPassword').value = '';
+            document.getElementById('groupPassword').focus();
+            
+            // Сохраняем выбранную группу для входа
+            window.selectedGroupForJoin = group;
+        }
+
+        function createGroup() {
+            const name = document.getElementById('newGroupName').value.trim();
+            const password = document.getElementById('newGroupPassword').value.trim();
+            const description = document.getElementById('newGroupDescription').value.trim();
+            
+            if (!name) {
+                showNotification('Введите название группы!', 'error');
+                return;
+            }
+            
+            if (!password) {
+                showNotification('Придумайте пароль для группы!', 'error');
+                return;
+            }
+            
+            // Проверяем, нет ли группы с таким именем
+            if (allGroups.some(g => g.name.toLowerCase() === name.toLowerCase())) {
+                showNotification('Группа с таким названием уже существует!', 'error');
+                return;
+            }
+            
+            const groupId = generateId();
+            const workerCode = generateWorkerCode();
+            
+            const newGroup = {
+                id: groupId,
+                name: name,
+                password: password,
+                description: description,
+                workerCode: workerCode,
+                adminId: null, // Будет установлен после создания первого пользователя
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            allGroups.push(newGroup);
+            
+            // Создаем администратора группы
+            const adminName = prompt('Введите ваше ФИО для администратора группы:');
+            if (!adminName) {
+                showNotification('ФИО обязательно для создания группы!', 'error');
+                allGroups = allGroups.filter(g => g.id !== groupId);
+                return;
+            }
+            
+            const adminId = generateId();
+            const adminUser = {
+                id: adminId,
+                name: adminName,
+                groupId: groupId,
+                role: 'admin',
+                deviceId: window.deviceId,
+                createdAt: new Date().toISOString(),
+                lastSeen: new Date().toISOString()
+            };
+            
+            allUsers.push(adminUser);
+            newGroup.adminId = adminId;
+            
+            // Устанавливаем текущую группу и пользователя
+            currentGroup = newGroup;
+            currentUser = adminUser;
+            isAdmin = true;
+            
+            saveData();
+            showMainMenu();
+            
+            showNotification(`Группа "${name}" создана!`, 'success');
+            showNotification('Вы стали администратором группы', 'info');
+            
+            // Очищаем форму
+            document.getElementById('newGroupName').value = '';
+            document.getElementById('newGroupPassword').value = '';
+            document.getElementById('newGroupDescription').value = '';
+        }
+
+        function joinGroup() {
+            const password = document.getElementById('groupPassword').value.trim();
+            
+            if (!window.selectedGroupForJoin) {
+                showNotification('Сначала выберите группу!', 'error');
+                return;
+            }
+            
+            if (password !== window.selectedGroupForJoin.password) {
+                showNotification('Неверный пароль группы!', 'error');
+                return;
+            }
+            
+            const userName = prompt('Введите ваше ФИО для входа в группу:');
+            if (!userName) {
+                showNotification('ФИО обязательно для входа в группу!', 'error');
+                return;
+            }
+            
+            const group = window.selectedGroupForJoin;
+            
+            // Проверяем, есть ли уже пользователь с таким именем в группе
+            let user = allUsers.find(u => 
+                u.groupId === group.id && 
+                u.name.toLowerCase() === userName.toLowerCase()
+            );
+            
+            if (!user) {
+                // Создаем нового пользователя
+                const userId = generateId();
+                user = {
+                    id: userId,
+                    name: userName,
+                    groupId: group.id,
+                    role: 'member',
+                    deviceId: window.deviceId,
+                    createdAt: new Date().toISOString(),
+                    lastSeen: new Date().toISOString()
+                };
+                allUsers.push(user);
+            } else {
+                // Обновляем существующего пользователя
+                user.lastSeen = new Date().toISOString();
+                user.deviceId = window.deviceId;
+            }
+            
+            currentGroup = group;
+            currentUser = user;
+            isAdmin = user.role === 'admin';
+            
+            saveData();
+            showMainMenu();
+            
+            showNotification(`Добро пожаловать в группу "${group.name}"!`, 'success');
+        }
+
+        function leaveGroup() {
+            if (confirm('Вы уверены, что хотите выйти из группы?')) {
+                if (isAdmin) {
+                    const confirmDelete = confirm('Вы администратор группы! Если вы выйдете, группа останется без администратора. Продолжить?');
+                    if (!confirmDelete) return;
+                }
+                
+                currentGroup = null;
+                currentUser = null;
+                isAdmin = false;
+                isWorkerMode = false;
+                
+                localStorage.removeItem('ozon_current_group');
+                localStorage.removeItem('ozon_current_user');
+                
+                document.getElementById('mainMenu').style.display = 'none';
+                document.getElementById('groupSelectScreen').style.display = 'flex';
+                
+                updateGroupsList();
+                showNotification('Вы вышли из группы', 'info');
+            }
+        }
+
+        // ===== ОСНОВНЫЕ ФУНКЦИИ =====
+        function setupEventListeners() {
+            // Группы
+            document.getElementById('createGroupBtn').addEventListener('click', createGroup);
+            document.getElementById('joinGroupBtn').addEventListener('click', joinGroup);
+            document.getElementById('leaveGroupBtn').addEventListener('click', leaveGroup);
+            
+            // Навигация
+            document.getElementById('manualSyncBtn').addEventListener('click', manualSync);
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', switchTab);
+            });
+            
+            // Заказ товаров
+            document.getElementById('addProductToOrderBtn').addEventListener('click', addProductToOrder);
+            document.getElementById('copyOrderBtn').addEventListener('click', copyOrderNumber);
+            document.getElementById('submitOrderBtn').addEventListener('click', submitOrder);
+            document.getElementById('refreshOrdersBtn').addEventListener('click', updateUserOrdersList);
+            
+            // Рабочий режим
+            document.getElementById('enterWorkModeBtn').addEventListener('click', enterWorkMode);
+            document.getElementById('refreshWorkOrdersBtn')?.addEventListener('click', refreshWorkOrders);
+            
+            // Выдача заказов
+            document.getElementById('searchOrderBtn').addEventListener('click', searchOrder);
+            document.getElementById('refreshReadyOrdersBtn')?.addEventListener('click', refreshReadyOrders);
+            document.getElementById('searchOrderNumber').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchOrder();
+            });
+            
+            // Управление группой
+            document.getElementById('refreshMembersBtn')?.addEventListener('click', updateGroupMembers);
+            document.getElementById('generateWorkerCodeBtn')?.addEventListener('click', generateNewWorkerCode);
+            document.getElementById('copyInviteLinkBtn')?.addEventListener('click', copyInviteLink);
+            document.getElementById('changeGroupPasswordBtn')?.addEventListener('click', changeGroupPassword);
+            document.getElementById('deleteGroupBtn')?.addEventListener('click', deleteGroup);
+            
+            // Синхронизация
+            document.getElementById('forceSyncBtn').addEventListener('click', forceSync);
+            
+            // Модальные окна выдачи
+            document.getElementById('closeDeliverModalBtn').addEventListener('click', closeDeliverModal);
+            document.getElementById('cancelDeliverBtn').addEventListener('click', closeDeliverModal);
+            document.getElementById('confirmDeliverBtn').addEventListener('click', confirmOrderDelivery);
+        }
+
+        function showMainMenu() {
+            document.getElementById('groupSelectScreen').style.display = 'none';
+            document.getElementById('mainMenu').style.display = 'block';
+            
+            // Обновляем информацию
+            updateGroupInfo();
+            updateUserInfo();
+            updateGroupStats();
+            generateOrderNumber();
+            updateUserOrdersList();
+            updateBadges();
+        }
+
+        function updateGroupInfo() {
+            if (!currentGroup) return;
+            
+            document.getElementById('currentGroupName').textContent = currentGroup.name;
+            document.getElementById('groupBadge').className = `group-badge ${isAdmin ? 'admin' : ''}`;
+            document.getElementById('groupInfoName').textContent = currentGroup.name;
+            document.getElementById('groupInfoId').textContent = currentGroup.id.substring(0, 12) + '...';
+            document.getElementById('groupInfoCreated').textContent = new Date(currentGroup.createdAt).toLocaleDateString('ru-RU');
+            document.getElementById('groupInfoDescription').textContent = currentGroup.description || 'Описание не указано';
+            
+            // Показываем/скрываем настройки администратора
+            document.getElementById('groupSettingsCard').style.display = isAdmin ? 'block' : 'none';
+            document.getElementById('adminBadge').style.display = isAdmin ? 'inline-flex' : 'none';
+            
+            // Обновляем код сотрудника
+            if (isAdmin && currentGroup.workerCode) {
+                document.getElementById('groupWorkerCode').value = currentGroup.workerCode;
+            }
+            
+            // Генерируем ссылку для приглашения
+            if (isAdmin) {
+                const inviteLink = `${window.location.origin}${window.location.pathname}#group=${currentGroup.id}`;
+                document.getElementById('groupInviteLink').value = inviteLink;
+            }
+        }
+
+        function updateUserInfo() {
+            if (!currentUser) return;
+            
+            document.getElementById('currentUserName').textContent = currentUser.name;
+            document.getElementById('userRole').textContent = isAdmin ? 'Администратор' : 'Участник';
+            document.getElementById('userRole').style.color = isAdmin ? 'var(--warning)' : 'var(--info)';
+        }
+
+        function updateGroupStats() {
+            if (!currentGroup) return;
+            
+            const groupUsers = allUsers.filter(u => u.groupId === currentGroup.id);
+            const groupOrders = allOrders.filter(o => o.groupId === currentGroup.id);
+            
+            document.getElementById('groupMembersCount').textContent = groupUsers.length;
+            document.getElementById('groupOrdersCount').textContent = groupOrders.length;
+            document.getElementById('syncMembersCount').textContent = groupUsers.length;
+            document.getElementById('syncOrdersCount').textContent = groupOrders.length;
+            
+            // Обновляем статистику заказов
+            const totalOrders = groupOrders.length;
+            const pendingOrders = groupOrders.filter(o => o.status === 'pending').length;
+            const readyOrders = groupOrders.filter(o => o.status === 'ready').length;
+            const deliveredOrders = groupOrders.filter(o => o.status === 'delivered').length;
+            
+            document.getElementById('totalOrdersStat').textContent = totalOrders;
+            document.getElementById('pendingOrdersStat').textContent = pendingOrders;
+            document.getElementById('readyOrdersStat').textContent = readyOrders;
+            document.getElementById('deliveredOrdersStat').textContent = deliveredOrders;
+            
+            // Обновляем статистику пользователя
+            const userOrders = groupOrders.filter(o => o.userId === currentUser.id);
+            document.getElementById('userStats').textContent = `• ${userOrders.length} заказов`;
+        }
+
+        function updateBadges() {
+            if (!currentGroup || !currentUser) return;
+            
+            const groupOrders = allOrders.filter(o => o.groupId === currentGroup.id);
+            const userOrders = groupOrders.filter(o => o.userId === currentUser.id);
+            
+            // Бейдж для заказов пользователя
+            const userPendingOrders = userOrders.filter(o => o.status === 'pending' || o.status === 'ready').length;
+            document.getElementById('orderBadge').textContent = userPendingOrders;
+            document.getElementById('orderBadge').style.display = userPendingOrders > 0 ? 'inline-block' : 'none';
+            
+            // Бейдж для работы
+            if (isWorkerMode) {
+                const workPendingOrders = groupOrders.filter(o => o.status === 'pending').length;
+                document.getElementById('workBadge').textContent = workPendingOrders;
+                document.getElementById('workBadge').style.display = workPendingOrders > 0 ? 'inline-block' : 'none';
+            }
+            
+            // Бейдж для выдачи
+            const readyOrders = userOrders.filter(o => o.status === 'ready').length;
+            document.getElementById('deliveryBadge').textContent = readyOrders;
+            document.getElementById('deliveryBadge').style.display = readyOrders > 0 ? 'inline-block' : 'none';
+        }
+
+        // ===== ЗАКАЗ ТОВАРОВ =====
+        function addProductToOrder() {
+            const productName = document.getElementById('productName').value.trim();
+            if (!productName) {
+                showNotification('Введите название товара!', 'error');
+                return;
+            }
+            
+            currentOrderProducts.push(productName);
+            document.getElementById('productName').value = '';
+            updateOrderProductsDisplay();
+            
+            document.getElementById('submitOrderBtn').disabled = false;
+            showNotification('Товар добавлен в заказ!', 'success');
+        }
+
+        function updateOrderProductsDisplay() {
+            const container = document.getElementById('orderProductsContainer');
+            
+            if (currentOrderProducts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h3>Корзина пуста</h3>
+                        <p>Добавьте хотя бы один товар для создания заказа</p>
+                    </div>
+                `;
+                document.getElementById('submitOrderBtn').disabled = true;
+            } else {
+                container.innerHTML = '';
+                currentOrderProducts.forEach((product, index) => {
+                    const productElement = document.createElement('div');
+                    productElement.className = 'product-item';
+                    productElement.style.cssText = 'display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 10px;';
+                    productElement.innerHTML = `
+                        <i class="fas fa-box" style="color: var(--primary);"></i>
+                        <span style="flex: 1;">${product}</span>
+                        <button class="remove-product-btn" data-index="${index}" style="background: none; border: none; color: var(--danger); cursor: pointer; padding: 5px 10px; border-radius: 5px;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    container.appendChild(productElement);
+                });
+                
+                document.querySelectorAll('.remove-product-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.dataset.index);
+                        currentOrderProducts.splice(index, 1);
+                        updateOrderProductsDisplay();
+                    });
+                });
+            }
+        }
+
+        function generateOrderNumber() {
+            const orderNumber = 'OZ-' + Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('orderNumberDisplay').value = orderNumber;
+            isOrderNumberCopied = false;
+            document.getElementById('copyWarning').style.display = 'none';
+            return orderNumber;
+        }
+
+        function copyOrderNumber() {
+            const orderNumber = document.getElementById('orderNumberDisplay').value;
+            if (!orderNumber) return;
+            
+            navigator.clipboard.writeText(orderNumber).then(() => {
+                isOrderNumberCopied = true;
+                document.getElementById('copyWarning').style.display = 'none';
+                showNotification('Номер заказа скопирован!', 'success');
+            }).catch(() => {
+                const textArea = document.createElement('textarea');
+                textArea.value = orderNumber;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                isOrderNumberCopied = true;
+                document.getElementById('copyWarning').style.display = 'none';
+                showNotification('Номер заказа скопирован!', 'success');
+            });
+        }
+
+        function submitOrder() {
+            if (!currentUser || !currentGroup) {
+                showNotification('Сначала войдите в группу!', 'error');
+                return;
+            }
+            
+            if (currentOrderProducts.length === 0) {
+                showNotification('Добавьте хотя бы один товар!', 'error');
+                return;
+            }
+            
+            if (!isOrderNumberCopied) {
+                document.getElementById('copyWarning').style.display = 'block';
+                showNotification('Скопируйте номер заказа перед отправкой!', 'error');
+                return;
+            }
+            
+            const orderNumber = document.getElementById('orderNumberDisplay').value;
+            
+            if (allOrders.some(order => order.orderNumber === orderNumber)) {
+                showNotification('Заказ с таким номером уже существует!', 'error');
+                generateOrderNumber();
+                isOrderNumberCopied = false;
+                return;
+            }
+            
+            const newOrder = {
+                id: generateId(),
+                orderNumber: orderNumber,
+                userId: currentUser.id,
+                userName: currentUser.name,
+                groupId: currentGroup.id,
+                groupName: currentGroup.name,
+                products: [...currentOrderProducts],
+                date: new Date().toLocaleString('ru-RU'),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                status: 'pending',
+                history: [`Создан пользователем ${currentUser.name}: ${new Date().toLocaleString('ru-RU')}`]
+            };
+            
+            allOrders.push(newOrder);
+            saveData();
+            
+            // Очищаем форму
+            currentOrderProducts = [];
+            updateOrderProductsDisplay();
+            isOrderNumberCopied = false;
+            document.getElementById('copyWarning').style.display = 'none';
+            generateOrderNumber();
+            
+            showNotification(`Заказ ${orderNumber} создан в группе!`, 'success');
+            updateUserOrdersList();
+            updateGroupStats();
+            updateBadges();
+        }
+
+        function updateUserOrdersList() {
+            if (!currentUser || !currentGroup) return;
+            
+            const userOrdersList = document.getElementById('userOrdersList');
+            const userOrders = allOrders.filter(o => 
+                o.groupId === currentGroup.id && 
+                o.userId === currentUser.id
+            ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            if (userOrders.length === 0) {
+                userOrdersList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h3>У вас пока нет заказов</h3>
+                        <p>Создайте ваш первый заказ в группе</p>
+                    </div>
+                `;
+            } else {
+                userOrdersList.innerHTML = '';
+                userOrders.forEach(order => {
+                    const statusClass = order.status === 'ready' ? 'badge-ready' : 
+                                      order.status === 'delivered' ? 'badge-delivered' : 'badge-pending';
+                    const statusText = order.status === 'ready' ? 'Готов к выдаче' :
+                                      order.status === 'delivered' ? 'Выдан' : 'Ожидает обработки';
+                    
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'package-item';
+                    orderElement.innerHTML = `
+                        <div class="package-header">
+                            <div class="package-code">${order.orderNumber}</div>
+                            <span class="package-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="package-details">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                <div>
+                                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Дата</div>
+                                    <div style="font-size: 1.1rem; color: white;">${order.date}</div>
+                                </div>
+                                <div>
+                                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Товаров</div>
+                                    <div style="font-size: 1.1rem; color: white;">${order.products.length} шт.</div>
+                                </div>
+                            </div>
+                            ${order.status === 'ready' ? `
+                            <div style="padding: 15px; background: rgba(46, 204, 113, 0.1); border-radius: 8px; border-left: 4px solid var(--success);">
+                                <div style="color: var(--success); font-weight: 600; margin-bottom: 5px;">
+                                    <i class="fas fa-check-circle"></i> Заказ готов к выдаче!
+                                </div>
+                                <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">
+                                    Для получения перейдите в "Выдача заказов" и введите номер: <strong>${order.orderNumber}</strong>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    userOrdersList.appendChild(orderElement);
+                });
+            }
+        }
+
+        // ===== РАБОЧИЙ РЕЖИМ =====
+        function enterWorkMode() {
+            const workerCode = document.getElementById('workerCode').value.trim();
+            
+            if (!currentGroup) {
+                showNotification('Сначала войдите в группу!', 'error');
+                return;
+            }
+            
+            if (workerCode !== currentGroup.workerCode) {
+                showNotification('Неверный код сотрудника!', 'error');
+                return;
+            }
+            
+            isWorkerMode = true;
+            document.getElementById('workerAccessCard').style.display = 'none';
+            document.getElementById('workArea').style.display = 'block';
+            
+            showNotification('Вы вошли в режим сотрудника!', 'success');
+            refreshWorkOrders();
+        }
+
+        function refreshWorkOrders() {
+            if (!currentGroup || !isWorkerMode) return;
+            
+            const workOrdersList = document.getElementById('workOrdersList');
+            const pendingOrders = allOrders.filter(o => 
+                o.groupId === currentGroup.id && 
+                o.status === 'pending'
+            ).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            
+            if (pendingOrders.length === 0) {
+                workOrdersList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Все заказы обработаны</h3>
+                        <p>Нет заказов для обработки в группе</p>
+                    </div>
+                `;
+            } else {
+                workOrdersList.innerHTML = '';
+                pendingOrders.forEach(order => {
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'package-item';
+                    orderElement.innerHTML = `
+                        <div class="package-header">
+                            <div class="package-code">${order.orderNumber}</div>
+                            <span class="package-badge badge-pending">Ожидает обработки</span>
+                        </div>
+                        <div class="package-details">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                                <div>
+                                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Заказчик</div>
+                                    <div style="font-size: 1.1rem; color: white;">${order.userName}</div>
+                                </div>
+                                <div>
+                                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Дата</div>
+                                    <div style="font-size: 1.1rem; color: white;">${order.date}</div>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div>
+                                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Товаров</div>
+                                    <div style="font-size: 1.1rem; color: white;">${order.products.length} шт.</div>
+                                </div>
+                                <div>
+                                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">ID заказа</div>
+                                    <div style="font-size: 1.1rem; color: white; font-family: monospace;">${order.id.substring(0, 12)}...</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-success process-order-btn" data-order-id="${order.id}" style="flex: 1;">
+                                <i class="fas fa-check-circle"></i> Обработать
+                            </button>
+                        </div>
+                    `;
+                    
+                    workOrdersList.appendChild(orderElement);
+                });
+                
+                document.querySelectorAll('.process-order-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const orderId = this.dataset.orderId;
+                        processOrder(orderId);
+                    });
+                });
+            }
+            
+            updateGroupStats();
+        }
+
+        function processOrder(orderId) {
+            const orderIndex = allOrders.findIndex(o => o.id === orderId);
+            if (orderIndex === -1) return;
+            
+            allOrders[orderIndex].status = 'ready';
+            allOrders[orderIndex].updatedAt = new Date().toISOString();
+            allOrders[orderIndex].history.push(`Обработан сотрудником: ${new Date().toLocaleString('ru-RU')}`);
+            
+            saveData();
+            showNotification(`Заказ ${allOrders[orderIndex].orderNumber} обработан!`, 'success');
+            refreshWorkOrders();
+            updateBadges();
+        }
+
+        // ===== ВЫДАЧА ЗАКАЗОВ =====
+        function searchOrder() {
+            const orderNumber = document.getElementById('searchOrderNumber').value.trim().toUpperCase();
+            
+            if (!orderNumber) {
+                showNotification('Введите номер заказа!', 'error');
+                return;
+            }
+            
+            if (!currentGroup) {
+                showNotification('Сначала войдите в группу!', 'error');
+                return;
+            }
+            
+            const order = allOrders.find(o => 
+                o.groupId === currentGroup.id && 
+                o.orderNumber === orderNumber
+            );
+            
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!order) {
+                resultsDiv.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: rgba(255, 255, 255, 0.7);">
+                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 20px; color: var(--warning);"></i>
+                        <h3 style="color: var(--warning); margin-bottom: 10px;">Заказ не найден</h3>
+                        <p>Заказ с номером <strong>${orderNumber}</strong> не найден в вашей группе.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let statusText, statusColor, canDeliver = false;
+            
+            if (order.status === 'ready') {
+                statusText = 'Готов к выдаче';
+                statusColor = 'var(--success)';
+                canDeliver = true;
+            } else if (order.status === 'delivered') {
+                statusText = 'Уже выдан';
+                statusColor = 'var(--info)';
+            } else {
+                statusText = 'Ожидает обработки';
+                statusColor = 'var(--warning)';
+            }
+            
+            resultsDiv.innerHTML = `
+                <div class="package-item">
+                    <div class="package-header">
+                        <div class="package-code">${order.orderNumber}</div>
+                        <span class="package-badge ${order.status === 'ready' ? 'badge-ready' : order.status === 'delivered' ? 'badge-delivered' : 'badge-pending'}">
+                            ${statusText}
+                        </span>
+                    </div>
+                    <div class="package-details">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Заказчик</div>
+                                <div style="font-size: 1.1rem; color: white;">${order.userName}</div>
+                            </div>
+                            <div>
+                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Дата</div>
+                                <div style="font-size: 1.1rem; color: white;">${order.date}</div>
+                            </div>
+                        </div>
+                        <div style="margin: 20px 0;">
+                            <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Товары:</div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+                                ${order.products.map(product => `
+                                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                        <i class="fas fa-box" style="color: var(--primary); font-size: 0.8rem;"></i>
+                                        <span style="color: white;">${product}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    ${canDeliver ? `
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-success deliver-found-order-btn" data-order-id="${order.id}" style="flex: 1;">
+                            <i class="fas fa-box-check"></i> Получить заказ
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            const deliverBtn = document.querySelector('.deliver-found-order-btn');
+            if (deliverBtn) {
+                deliverBtn.addEventListener('click', function() {
+                    const orderId = this.dataset.orderId;
+                    openDeliverModal(orderId);
+                });
+            }
+            
+            document.getElementById('searchOrderNumber').value = '';
+        }
+
+        function refreshReadyOrders() {
+            if (!currentGroup) return;
+            
+            const readyOrdersList = document.getElementById('readyOrdersList');
+            const readyOrders = allOrders.filter(o => 
+                o.groupId === currentGroup.id && 
+                o.status === 'ready'
+            ).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            
+            if (readyOrders.length === 0) {
+                readyOrdersList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h3>Нет заказов для выдачи</h3>
+                        <p>Все готовые заказы уже выданы или ожидают обработки</p>
+                    </div>
+                `;
+            } else {
+                readyOrdersList.innerHTML = '';
+                readyOrders.forEach(order => {
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'package-item';
+                    orderElement.innerHTML = `
+                        <div class="package-header">
+                            <div class="package-code">${order.orderNumber}</div>
+                            <span class="package-badge badge-ready">Готов к выдаче</span>
+                        </div>
+                        <div class="package-details">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                                <div>
+                                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Заказчик</div>
+                                    <div style="font-size: 1.1rem; color: white;">${order.userName}</div>
+                                </div>
+                                <div>
+                                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Дата</div>
+                                    <div style="font-size: 1.1rem; color: white;">${order.date}</div>
+                                </div>
+                            </div>
+                            <div style="margin: 20px 0;">
+                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 5px;">Товары:</div>
+                                <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px;">
+                                    ${order.products.slice(0, 3).map(product => `
+                                        <div style="color: white; padding: 5px 0; font-size: 0.9rem;">• ${product}</div>
+                                    `).join('')}
+                                    ${order.products.length > 3 ? `
+                                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.8rem; padding: 5px 0;">
+                                            ...и еще ${order.products.length - 3} товаров
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-success deliver-ready-order-btn" data-order-id="${order.id}" style="flex: 1;">
+                                <i class="fas fa-box-check"></i> Получить
+                            </button>
+                        </div>
+                    `;
+                    
+                    readyOrdersList.appendChild(orderElement);
+                });
+                
+                document.querySelectorAll('.deliver-ready-order-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const orderId = this.dataset.orderId;
+                        openDeliverModal(orderId);
+                    });
+                });
+            }
+        }
+
+        function openDeliverModal(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (!order || order.status !== 'ready') return;
+            
+            currentDeliveryOrder = order;
+            
+            document.getElementById('deliverOrderNumber').textContent = order.orderNumber;
+            document.getElementById('deliverCustomer').textContent = order.userName;
+            document.getElementById('expectedCustomerName').textContent = order.userName;
+            document.getElementById('deliverGroupName').textContent = order.groupName;
+            
+            const productsList = document.getElementById('deliverOrderProducts');
+            productsList.innerHTML = '';
+            
+            order.products.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.style.cssText = 'display: flex; align-items: center; gap: 15px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 10px;';
+                productElement.innerHTML = `
+                    <i class="fas fa-box" style="color: var(--primary);"></i>
+                    <span style="flex: 1; color: white;">${product}</span>
+                `;
+                productsList.appendChild(productElement);
+            });
+            
+            document.getElementById('deliverOrderModal').style.display = 'flex';
+        }
+
+        function closeDeliverModal() {
+            document.getElementById('deliverOrderModal').style.display = 'none';
+            currentDeliveryOrder = null;
+        }
+
+        function confirmOrderDelivery() {
+            if (!currentDeliveryOrder) return;
+            
+            const orderIndex = allOrders.findIndex(o => o.id === currentDeliveryOrder.id);
+            if (orderIndex === -1) return;
+            
+            allOrders[orderIndex].status = 'delivered';
+            allOrders[orderIndex].updatedAt = new Date().toISOString();
+            allOrders[orderIndex].history.push(`Выдан: ${new Date().toLocaleString('ru-RU')}`);
+            
+            saveData();
+            showNotification(`Заказ ${currentDeliveryOrder.orderNumber} получен!`, 'success');
+            
+            closeDeliverModal();
+            refreshReadyOrders();
+            updateUserOrdersList();
+            updateGroupStats();
+            updateBadges();
+        }
+
+        // ===== УПРАВЛЕНИЕ ГРУППОЙ =====
+        function updateGroupMembers() {
+            if (!currentGroup) return;
+            
+            const membersList = document.getElementById('groupMembersList');
+            const groupMembers = allUsers.filter(u => u.groupId === currentGroup.id)
+                .sort((a, b) => {
+                    if (a.role === 'admin' && b.role !== 'admin') return -1;
+                    if (a.role !== 'admin' && b.role === 'admin') return 1;
+                    return new Date(b.lastSeen) - new Date(a.lastSeen);
+                });
+            
+            if (groupMembers.length === 0) {
+                membersList.innerHTML = `
+                    <div class="empty-state" style="padding: 30px 20px;">
+                        <i class="fas fa-user-friends"></i>
+                        <h3>Нет участников</h3>
+                        <p>В группе пока нет участников</p>
+                    </div>
+                `;
+            } else {
+                membersList.innerHTML = '';
+                groupMembers.forEach(member => {
+                    const isOnline = new Date() - new Date(member.lastSeen) < 5 * 60 * 1000; // 5 минут
+                    const memberElement = document.createElement('div');
+                    memberElement.className = 'member-item';
+                    memberElement.innerHTML = `
+                        <div class="member-info">
+                            <div class="member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <div style="color: white; font-weight: 600;">${member.name}</div>
+                                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.8rem;">
+                                    ${isOnline ? '🟢 Онлайн' : '⚫ Не в сети'}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="member-role ${member.role === 'admin' ? 'role-admin' : 'role-member'}">
+                            ${member.role === 'admin' ? 'Администратор' : 'Участник'}
+                        </div>
+                    `;
+                    membersList.appendChild(memberElement);
+                });
+            }
+        }
+
+        function generateNewWorkerCode() {
+            if (!isAdmin || !currentGroup) return;
+            
+            const newCode = generateWorkerCode();
+            currentGroup.workerCode = newCode;
+            currentGroup.updatedAt = new Date().toISOString();
+            
+            saveData();
+            document.getElementById('groupWorkerCode').value = newCode;
+            showNotification('Новый код сотрудника сгенерирован!', 'success');
+        }
+
+        function copyInviteLink() {
+            const inviteLink = document.getElementById('groupInviteLink').value;
+            if (!inviteLink) return;
+            
+            navigator.clipboard.writeText(inviteLink).then(() => {
+                showNotification('Ссылка скопирована в буфер обмена!', 'success');
+            }).catch(() => {
+                const textArea = document.createElement('textarea');
+                textArea.value = inviteLink;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showNotification('Ссылка скопирована!', 'success');
+            });
+        }
+
+        function changeGroupPassword() {
+            if (!isAdmin || !currentGroup) return;
+            
+            const newPassword = prompt('Введите новый пароль для группы:');
+            if (!newPassword) return;
+            
+            const confirmPassword = prompt('Повторите новый пароль:');
+            if (newPassword !== confirmPassword) {
+                showNotification('Пароли не совпадают!', 'error');
+                return;
+            }
+            
+            currentGroup.password = newPassword;
+            currentGroup.updatedAt = new Date().toISOString();
+            
+            saveData();
+            showNotification('Пароль группы изменен!', 'success');
+        }
+
+        function deleteGroup() {
+            if (!isAdmin || !currentGroup) return;
+            
+            const confirmDelete = confirm(`Вы уверены, что хотите удалить группу "${currentGroup.name}"? Это действие нельзя отменить!`);
+            if (!confirmDelete) return;
+            
+            // Удаляем группу
+            allGroups = allGroups.filter(g => g.id !== currentGroup.id);
+            
+            // Удаляем пользователей группы
+            allUsers = allUsers.filter(u => u.groupId !== currentGroup.id);
+            
+            // Удаляем заказы группы
+            allOrders = allOrders.filter(o => o.groupId !== currentGroup.id);
+            
+            // Сбрасываем текущие данные
+            currentGroup = null;
+            currentUser = null;
+            isAdmin = false;
+            isWorkerMode = false;
+            
+            localStorage.removeItem('ozon_current_group');
+            localStorage.removeItem('ozon_current_user');
+            saveData();
+            
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('groupSelectScreen').style.display = 'flex';
+            
+            updateGroupsList();
+            showNotification('Группа удалена!', 'warning');
+        }
+
+        // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+        function switchTab(e) {
+            const tabId = e.currentTarget.dataset.tab;
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            e.currentTarget.classList.add('active');
+            
+            document.querySelectorAll('.menu-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'work-tab') {
+                if (!isWorkerMode) {
+                    document.getElementById('workArea').style.display = 'none';
+                    document.getElementById('workerAccessCard').style.display = 'block';
+                } else {
+                    refreshWorkOrders();
+                }
+            } else if (tabId === 'delivery-tab') {
+                refreshReadyOrders();
+            } else if (tabId === 'group-tab') {
+                updateGroupMembers();
+            }
+        }
+
+        function manualSync() {
+            updateSyncStatus('syncing', 'Ручная синхронизация...');
+            setTimeout(() => {
+                performSync();
+                showNotification('Синхронизация выполнена', 'success');
+            }, 1000);
+        }
+
+        function forceSync() {
+            updateSyncStatus('syncing', 'Принудительная синхронизация...');
+            saveToSharedStorage();
+            setTimeout(() => {
+                loadSharedData();
+                updateUIAfterSync();
+                updateSyncStatus('synced', 'Данные синхронизированы');
+                showNotification('Принудительная синхронизация выполнена', 'success');
+            }, 1500);
+        }
+
+        function updateUIAfterSync() {
+            if (!currentGroup || !currentUser) return;
+            
+            updateUserOrdersList();
+            updateGroupStats();
+            updateBadges();
+            updateGroupInfo();
+            updateGroupMembers();
+            
+            const activeTab = document.querySelector('.nav-item.active');
+            if (activeTab) {
+                const tabId = activeTab.dataset.tab;
+                if (tabId === 'work-tab' && isWorkerMode) {
+                    refreshWorkOrders();
+                } else if (tabId === 'delivery-tab') {
+                    refreshReadyOrders();
+                }
+            }
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function generateWorkerCode() {
+            return Math.random().toString(36).substr(2, 6).toUpperCase();
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}" style="font-size: 1.2rem;"></i>
+                    <div>${message}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideInRight 0.3s ease reverse, fadeOut 0.3s ease forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Очистка при закрытии
+        window.addEventListener('beforeunload', function() {
+            if (syncInterval) clearInterval(syncInterval);
+        });
+    </script>
+</body>
+</html>
